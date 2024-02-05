@@ -85,22 +85,26 @@ const terminalInput = document.querySelector('.terminal_input');
 const terminalResult = document.querySelector('.terminal_result');
 const lastLogin = localStorage.getItem('lastLogin');
 const commandHistory = [];
-const commandIndex = -1;
+let commandIndex = -1;
 const CUSTOM_COMMANDS = {
   hello: {
     msg: 'Hello'
   },
   /* niestandardowe komendy */
-    weather:  async (city) => {
+  weather: {
+    fetch: async (city) => {
       const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=7bb96bdc43ef502bc36c78a30db8b2da`);
       const data = await response.json();
-      if (data) terminalResult.innerHTML += `<pre>Weather in ${city}:</pre>
-      <pre>Temperature: ${data.main.temp} °C,</pre>
-      <pre>Feels like: ${data.main.feels_like} °C,</pre>
-      <pre>Wind speed: ${data.wind.speed} m/s,</pre>
-      <pre>Humidity: ${data.main.humidity}%,</pre>
-      <pre>Pressure: ${data.main.pressure} hPa</pre>`;
+      if (data) {
+        return `<pre>Weather in ${city}:</pre>
+        <pre>Temperature: ${data.main.temp} °C,</pre>
+        <pre>Feels like: ${data.main.feels_like} °C,</pre>
+        <pre>Wind speed: ${data.wind.speed} m/s,</pre>
+        <pre>Humidity: ${data.main.humidity}%,</pre>
+        <pre>Pressure: ${data.main.pressure} hPa</pre>`;
+      }
     }
+  }
 };
 const COMMANDS = {
   clear: () => terminalResult.innerHTML = '',
@@ -116,15 +120,23 @@ const COMMANDS = {
   },
   ...CUSTOM_COMMANDS
 };
-
 localStorage.setItem('lastLogin', new Date().toString()); 
 terminalResult.innerHTML += `<pre>Last login: ${lastLogin}</pre>`;
 terminalInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     const command = this.value.split(' ');
     const action = COMMANDS[command[0]];
+    console.log(typeof action);
+
     if (action) {
-      const result = action(command[1]);
+      let result;
+      if (typeof action === 'function') {
+        result = action(command[1]);
+      } else if (action.fetch) {
+        result = action.fetch(command[1]);
+      } else if (action.msg) {
+        result = action.msg;
+      }
       if (result instanceof Promise) {
         result.then(res => terminalResult.innerHTML += `<pre>${res}</pre>`);
       } else {
