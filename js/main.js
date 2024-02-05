@@ -144,9 +144,11 @@ terminalInput.addEventListener('keydown', function(e) {
     } else {
       terminalResult.innerHTML += `<pre>Nieznana komenda: ${command[0]}</pre>`;
     }
+    terminalResult.scrollTop = terminalResult.scrollHeight;
     commandHistory.push(this.value);
     commandIndex = commandHistory.length - 1;
     this.value = '';
+
   } else if (e.key === 'ArrowUp') {
     if (commandIndex >= 0) {
       this.value = commandHistory[commandIndex];
