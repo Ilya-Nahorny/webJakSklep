@@ -93,8 +93,8 @@ const CUSTOM_COMMANDS = {
   /* niestandardowe komendy */
   weather: {
     fetch: async (city) => {
-      const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=7bb96bdc43ef502bc36c78a30db8b2da`);
-      const data = await response.json();
+      let response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=7bb96bdc43ef502bc36c78a30db8b2da`);
+      let data = await response.json();
       if (data) {
         return `<pre>Weather in ${city}:</pre>
         <pre>Temperature: ${data.main.temp} °C,</pre>
@@ -110,8 +110,8 @@ const COMMANDS = {
   clear: () => terminalResult.innerHTML = '',
   help: () => Object.keys(COMMANDS).join(', '),
   quote: async () => {
-    const response = await fetch('https://dummyjson.com/quotes/random');
-    const data = await response.json();
+    let response = await fetch('https://dummyjson.com/quotes/random');
+    let data = await response.json();
     if (data) return data.quote;
   },
   double: (x) => {
@@ -126,7 +126,6 @@ terminalInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     const command = this.value.split(' ');
     const action = COMMANDS[command[0]];
-    console.log(typeof action);
 
     if (action) {
       let result;
